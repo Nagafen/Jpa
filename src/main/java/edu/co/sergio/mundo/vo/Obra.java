@@ -27,11 +27,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "obra")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Obra_1.findAll", query = "SELECT o FROM Obra_1 o")
-    , @NamedQuery(name = "Obra_1.findByNombreobra", query = "SELECT o FROM Obra_1 o WHERE o.nombreobra = :nombreobra")
-    , @NamedQuery(name = "Obra_1.findByDescripcion", query = "SELECT o FROM Obra_1 o WHERE o.descripcion = :descripcion")
-    , @NamedQuery(name = "Obra_1.findByEstilo", query = "SELECT o FROM Obra_1 o WHERE o.estilo = :estilo")
-    , @NamedQuery(name = "Obra_1.findByValor", query = "SELECT o FROM Obra_1 o WHERE o.valor = :valor")})
+    @NamedQuery(name = "Obra.findAll", query = "SELECT o FROM Obra o")
+    , @NamedQuery(name = "Obra.findByNombreobra", query = "SELECT o FROM Obra o WHERE o.nombreobra = :nombreobra")
+    , @NamedQuery(name = "Obra.findByDescripcion", query = "SELECT o FROM Obra o WHERE o.descripcion = :descripcion")
+    , @NamedQuery(name = "Obra.findByEstilo", query = "SELECT o FROM Obra o WHERE o.estilo = :estilo")
+    , @NamedQuery(name = "Obra.findByValor", query = "SELECT o FROM Obra o WHERE o.valor = :valor")})
 public class Obra implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -123,7 +123,7 @@ public class Obra implements Serializable {
 
     @Override
     public String toString() {
-        return "edu.co.sergio.mundo.vo.Obra_1[ nombreobra=" + nombreobra + " ]";
+        return "edu.co.sergio.mundo.vo.Obra[ nombreobra=" + nombreobra + " ]";
     }
     
 }
