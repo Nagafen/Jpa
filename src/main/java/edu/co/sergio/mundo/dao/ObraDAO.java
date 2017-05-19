@@ -62,8 +62,9 @@ public class ObraDAO implements Serializable {
             throw ex;
         } finally {
             if (em != null) {
-                emf.close();
+                
                 em.close();
+                emf.close();
             }
         }
     }
@@ -101,8 +102,9 @@ public class ObraDAO implements Serializable {
             throw ex;
         } finally {
             if (em != null) {
-                emf.close();
+                
                 em.close();
+                emf.close();
             }
         }
     }
@@ -128,8 +130,9 @@ public class ObraDAO implements Serializable {
             em.getTransaction().commit();
         } finally {
             if (em != null) {
-                emf.close();
+                
                 em.close();
+                emf.close();
             }
         }
     }
@@ -154,8 +157,9 @@ public class ObraDAO implements Serializable {
             }
             return q.getResultList();
         } finally {
-            emf.close();
+            
             em.close();
+            emf.close();
         }
     }
 
@@ -164,8 +168,9 @@ public class ObraDAO implements Serializable {
         try {
             return em.find(Obra.class, id);
         } finally {
-            emf.close();
+            
             em.close();
+            emf.close();
         }
     }
 
@@ -178,8 +183,9 @@ public class ObraDAO implements Serializable {
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();
         } finally {
-            emf.close();
+            
             em.close();
+            emf.close();
         }
     }
     protected void startOperation() { 
