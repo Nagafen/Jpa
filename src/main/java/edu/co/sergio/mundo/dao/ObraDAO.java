@@ -36,7 +36,7 @@ public class ObraDAO implements Serializable {
     private EntityManagerFactory emf = null;
     private EntityManager em=null;
     public EntityManager getEntityManager() {
-        return emf.createEntityManager();
+        return this.emf.createEntityManager();
     }
 
     public void create(Obra obra) throws PreexistingEntityException, Exception {
