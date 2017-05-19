@@ -1,6 +1,7 @@
 package com.crunchify.jsp.servlet;
  
 import edu.co.sergio.mundo.dao.ObraDAO;
+import edu.co.sergio.mundo.vo.Artista;
 import edu.co.sergio.mundo.vo.Obra;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -8,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
  
 /**
@@ -26,15 +29,21 @@ public class HelloCrunchify extends HttpServlet {
         ObraDAO dao = new ObraDAO();
         
         Obra obra = new Obra();
-        obra.setNombreAutor(autor);
-        obra.setNombreObra(nombre);
+        Artista artist=new Artista();
+        artist.setNombreautor(autor);
+        obra.setNombreautor(artist);
+        obra.setNombreobra(nombre);
         obra.setDescripcion(descripcion);
         obra.setEstilo(estilo);
-        obra.setValor(Integer.valueOf(valor));
-        dao.insert(obra);
+        obra.setValor(Float.valueOf(valor));
+        try {
+            dao.create(obra);
+        } catch (Exception ex) {
+            Logger.getLogger(HelloCrunchify.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         //Listando la informacion  
-        List<Obra> obras =  dao.findAll();
+        List<Obra> obras =  dao.findObraEntities();
         request.setAttribute("obras", obras);
        
        

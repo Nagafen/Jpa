@@ -1,156 +1,207 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package edu.co.sergio.mundo.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import edu.co.sergio.mundo.dao.exceptions.NonexistentEntityException;
+import edu.co.sergio.mundo.dao.exceptions.PreexistingEntityException;
+import java.io.Serializable;
+import javax.persistence.Query;
+import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import edu.co.sergio.mundo.vo.Artista;
 import edu.co.sergio.mundo.vo.Obra;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 /**
- * @author Isabel-Fabian
- * @since 12/08/2015
- * @version 2
- * Clase que permite la gestion de la tabla Depto en la base de datos.
- * 
- * CREATE TABLE Depto(
- *     id_depto integer,
- *     nom_depto varchar(40),
- *     PRIMARY KEY(id_depto)
- * );
+ *
+ * @author Carlos
  */
- 
+public class ObraDAO implements Serializable {
 
-public class ObraDAO implements IBaseDatos<Obra> {
+    public ObraDAO() {
+    }
+    private EntityManagerFactory emf = null;
+    private EntityManager em=null;
+    public EntityManager getEntityManager() {
+        return emf.createEntityManager();
+    }
 
-	/**
-	 * Funcion que permite obtener una lista de los departamentos existentes en la base de datos
-	 * @return List<Departamento> Retorna la lista de Departamentos existentes en la base de datos
-	 */
-	public List<Obra> findAll() {
-		List<Obra> obras= null;
-	    String query = "Select nombreAutor, valor from (select nombreAutor,sum(valor) as valor from (artista natural join obra) group by nombreAutor ) as resultao where valor>10000 ;";
-	    Connection connection = null;
-            try {
-                connection = Conexion.getConnection();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(ObraDAO.class.getName()).log(Level.SEVERE, null, ex);
+    public void create(Obra obra) throws PreexistingEntityException, Exception {
+        startOperation();
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            Artista nombreautor = obra.getNombreautor();
+            if (nombreautor != null) {
+                nombreautor = em.getReference(nombreautor.getClass(), nombreautor.getNombreautor());
+                obra.setNombreautor(nombreautor);
             }
-	    try {
-	    Statement st = connection.createStatement();
-	    ResultSet rs = st.executeQuery(query);
-	    String Autor =null;
-            double valor=0;
-	
-	    while (rs.next()){
-                Obra registro=new Obra();
-	    	if(obras == null){
-	    		obras= new ArrayList<Obra>();     
-	    	}
-                Autor=rs.getString("nombreAutor");
-                registro.setNombreAutor(Autor);
-                valor=rs.getDouble("valor");
-                registro.setValor(valor);
-	        obras.add(registro);
-	    }
-	    st.close();
-	    
-	    } catch (SQLException e) {
-			System.out.println("Problemas al obtener la lista de Departamentos");
-			e.printStackTrace();
-		}
-	    
-	    return obras;
-	}
-
-	
-	/**
-	 * Funcion que permite realizar la insercion de un nuevo registro en la tabla Departamento
-	 * @param Departamento recibe un objeto de tipo Departamento 
-	 * @return boolean retorna true si la operacion de insercion es exitosa.
-	 */
-	public boolean insert(Obra t) {
-		boolean result=false;
-		Connection connection=null;
-            try {
-                connection = Conexion.getConnection();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(ObraDAO.class.getName()).log(Level.SEVERE, null, ex);
+            em.persist(obra);
+            if (nombreautor != null) {
+                nombreautor.getObraCollection().add(obra);
+                nombreautor = em.merge(nombreautor);
             }
-	    String query = " insert into Obra (nombreAutor,nombreObra,descripcion,estilo,valor)"  + " values (?,?,?,?,?)";
-        PreparedStatement preparedStmt=null;
-	    try {
-			preparedStmt = connection.prepareStatement(query);
-			preparedStmt.setString(1, t.getNombreAutor());
-                        preparedStmt.setString (2, t.getNombreObra());
-                        preparedStmt.setString (3, t.getDescripcion());
-                        preparedStmt.setString (4, t.getEstilo());
-                        preparedStmt.setDouble(5, t.getValor());
-			result= preparedStmt.execute();
-	    } catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
-	/**
-	 * Funcion que permite realizar la actualizacion de un nuevo registro en la tabla Departamento
-	 * @param Departamento recibe un objeto de tipo Departamento 
-	 * @return boolean retorna true si la operacion de actualizacion es exitosa.
-	 */
-	public boolean update(Obra t) {
-		boolean result=false;
-		Connection connection= null;
-            try {
-                connection = Conexion.getConnection();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(ObraDAO.class.getName()).log(Level.SEVERE, null, ex);
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            if (findObra(obra.getNombreobra()) != null) {
+                throw new PreexistingEntityException("Obra " + obra + " already exists.", ex);
             }
-		String query = "update Obra set nom_depto = ? where id_depto = ?";
-		PreparedStatement preparedStmt=null;
-		/*try {
-		    preparedStmt = connection.prepareStatement(query);
-		    preparedStmt.setString(1, t.getNom_departamento());
-                    preparedStmt.setInt   (2, t.getId_departamento());
-		    if (preparedStmt.executeUpdate() > 0){
-		    	result=true;
-		    }
-			    
-		} catch (SQLException e) {
-				e.printStackTrace();
-		}*/
-			
-		return result;
-	}
-
-	/**
-	 * Funcion que permite realizar la eliminario de registro en la tabla Departamento
-	 * @param Departamento recibe un objeto de tipo Departamento 
-	 * @return boolean retorna true si la operacion de borrado es exitosa.
-	 */
-	public boolean delete(Obra t) {
-	   boolean result=false;
-	   Connection connection = null;
-            try {
-                connection = Conexion.getConnection();
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(ObraDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        } finally {
+            if (em != null) {
+                emf.close();
+                em.close();
             }
-	   String query = "delete from Obra where nombreObra = ?";
-	   PreparedStatement preparedStmt=null;
-	   try {
-		     preparedStmt = connection.prepareStatement(query);
-		     preparedStmt.setString(1, t.getNombreObra());
-		    result= preparedStmt.execute();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	   
-	   return result;
-	}
+        }
+    }
+
+    public void edit(Obra obra) throws NonexistentEntityException, Exception {
+        startOperation();
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            Obra persistentObra = em.find(Obra.class, obra.getNombreobra());
+            Artista nombreautorOld = persistentObra.getNombreautor();
+            Artista nombreautorNew = obra.getNombreautor();
+            if (nombreautorNew != null) {
+                nombreautorNew = em.getReference(nombreautorNew.getClass(), nombreautorNew.getNombreautor());
+                obra.setNombreautor(nombreautorNew);
+            }
+            obra = em.merge(obra);
+            if (nombreautorOld != null && !nombreautorOld.equals(nombreautorNew)) {
+                nombreautorOld.getObraCollection().remove(obra);
+                nombreautorOld = em.merge(nombreautorOld);
+            }
+            if (nombreautorNew != null && !nombreautorNew.equals(nombreautorOld)) {
+                nombreautorNew.getObraCollection().add(obra);
+                nombreautorNew = em.merge(nombreautorNew);
+            }
+            em.getTransaction().commit();
+        } catch (Exception ex) {
+            String msg = ex.getLocalizedMessage();
+            if (msg == null || msg.length() == 0) {
+                String id = obra.getNombreobra();
+                if (findObra(id) == null) {
+                    throw new NonexistentEntityException("The obra with id " + id + " no longer exists.");
+                }
+            }
+            throw ex;
+        } finally {
+            if (em != null) {
+                emf.close();
+                em.close();
+            }
+        }
+    }
+
+    public void destroy(String id) throws NonexistentEntityException {
+        startOperation();
+        try {
+            em = getEntityManager();
+            em.getTransaction().begin();
+            Obra obra;
+            try {
+                obra = em.getReference(Obra.class, id);
+                obra.getNombreobra();
+            } catch (EntityNotFoundException enfe) {
+                throw new NonexistentEntityException("The obra with id " + id + " no longer exists.", enfe);
+            }
+            Artista nombreautor = obra.getNombreautor();
+            if (nombreautor != null) {
+                nombreautor.getObraCollection().remove(obra);
+                nombreautor = em.merge(nombreautor);
+            }
+            em.remove(obra);
+            em.getTransaction().commit();
+        } finally {
+            if (em != null) {
+                emf.close();
+                em.close();
+            }
+        }
+    }
+
+    public List<Obra> findObraEntities() {
+        return findObraEntities(true, -1, -1);
+    }
+
+    public List<Obra> findObraEntities(int maxResults, int firstResult) {
+        return findObraEntities(false, maxResults, firstResult);
+    }
+
+    private List<Obra> findObraEntities(boolean all, int maxResults, int firstResult) {
+        startOperation();
+        try {
+            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            cq.select(cq.from(Obra.class));
+            Query q = em.createQuery(cq);
+            if (!all) {
+                q.setMaxResults(maxResults);
+                q.setFirstResult(firstResult);
+            }
+            return q.getResultList();
+        } finally {
+            emf.close();
+            em.close();
+        }
+    }
+
+    public Obra findObra(String id) {
+        startOperation();
+        try {
+            return em.find(Obra.class, id);
+        } finally {
+            emf.close();
+            em.close();
+        }
+    }
+
+    public int getObraCount() {
+        startOperation();
+        try {
+            CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
+            Root<Obra> rt = cq.from(Obra.class);
+            cq.select(em.getCriteriaBuilder().count(rt));
+            Query q = em.createQuery(cq);
+            return ((Long) q.getSingleResult()).intValue();
+        } finally {
+            emf.close();
+            em.close();
+        }
+    }
+    protected void startOperation() { 
+        URI dbUri = null;
+        try {
+            dbUri = new URI(System.getenv("DATABASE_URL")); 
+            String username = dbUri.getUserInfo().split(":")[0];
+            String password = dbUri.getUserInfo().split(":")[1];
+            String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+
+            Map<String, String> properties = new HashMap<String, String>();
+            properties.put("javax.persistence.jdbc.url", dbUrl);
+            properties.put("javax.persistence.jdbc.user", username );
+            properties.put("javax.persistence.jdbc.password", password );
+            properties.put("javax.persistence.jdbc.driver", "org.postgresql.Driver");
+            properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+            this.emf = Persistence.createEntityManagerFactory("catalogPU",properties);
+            this.em = emf.createEntityManager();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ObraDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+       
+    }
 }

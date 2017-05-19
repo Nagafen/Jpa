@@ -33,7 +33,7 @@ body {
           List<Obra> obras  = (List<Obra>)request.getAttribute("obras");
            for (Obra obra : obras) {
          %>      
-         <h1> <%=obra.getNombreAutor()%> </h1><br/> 
+         <h1> <%=obra.getNombreautor().getNombreautor()%> </h1><br/> 
          <%      
           }
        }

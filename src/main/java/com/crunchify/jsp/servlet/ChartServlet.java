@@ -41,7 +41,7 @@ public class ChartServlet extends HttpServlet {
                 DefaultPieDataset dataset = new DefaultPieDataset();
                 ObraDAO dAO=new ObraDAO();
 	        //Crear la capa de servicios que se enlace con el DAO
-                ArrayList<Obra> arrayList=(ArrayList<Obra>) dAO.findAll();
+                ArrayList<Obra> arrayList=(ArrayList<Obra>) dAO.findObraEntities();
                 double sum = 0;
                 for (int i = 0; i < arrayList.size(); i++) {
                 sum=arrayList.get(i).getValor()+sum;
@@ -49,10 +49,10 @@ public class ChartServlet extends HttpServlet {
                 for (int i = 0; i < arrayList.size(); i++) {
                     if (arrayList.get(i).getValor()!=0) {
                             double porcentaje=(arrayList.get(i).getValor()/sum) *100;
-                dataset.setValue(arrayList.get(i).getNombreAutor(), porcentaje);
+                dataset.setValue(arrayList.get(i).getNombreautor().getNombreautor(), porcentaje);
                         }else{
                     double porcentaje=0;
-                dataset.setValue(arrayList.get(i).getNombreAutor(), porcentaje);
+                dataset.setValue(arrayList.get(i).getNombreautor().getNombreautor(), porcentaje);
                     }
             }
                 
