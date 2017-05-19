@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +42,8 @@ public class ChartServlet extends HttpServlet {
                 DefaultPieDataset dataset = new DefaultPieDataset();
                 ObraDAO dAO=new ObraDAO();
 	        //Crear la capa de servicios que se enlace con el DAO
-                ArrayList<Obra> arrayList=(ArrayList<Obra>) dAO.findObraEntities();
+                List<Obra> arrayList= dAO.findObraEntities();
+                
                 double sum = 0;
                 for (int i = 0; i < arrayList.size(); i++) {
                 sum=arrayList.get(i).getValor()+sum;
