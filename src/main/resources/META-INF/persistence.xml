@@ -3,7 +3,7 @@
   <persistence-unit name="catalogPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <!--    <jta-data-source>java:/petcatalog</jta-data-source>-->
-    <class>edu.co.sergio.mundo.vo.Obra_1</class>
+    <class>edu.co.sergio.mundo.vo.Obra</class>
     <class>edu.co.sergio.mundo.vo.Artista</class>
     <properties/>
   </persistence-unit>
