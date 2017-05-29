@@ -5,6 +5,7 @@
     <!--    <jta-data-source>java:/petcatalog</jta-data-source>-->
     <class>edu.co.sergio.mundo.vo.Obra</class>
     <class>edu.co.sergio.mundo.vo.Artista</class>
+    <class>edu.co.sergio.mundo.vo.Users</class>
     <properties/>
   </persistence-unit>
 </persistence>

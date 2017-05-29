@@ -5,8 +5,8 @@
  */
 package com.crunchify.jsp.servlet;
 
-import edu.co.sergio.mundo.dao.ObraDAO;
-import edu.co.sergio.mundo.vo.Obra;
+import edu.co.sergio.mundo.dao.UsersJpaController;
+import edu.co.sergio.mundo.vo.Users;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.IOException;
@@ -40,22 +40,14 @@ public class ChartServlet extends HttpServlet {
 	public JFreeChart getChart() {
 		
                 DefaultPieDataset dataset = new DefaultPieDataset();
-                ObraDAO dAO=new ObraDAO();
+                UsersJpaController dAO=new UsersJpaController();
 	        //Crear la capa de servicios que se enlace con el DAO
-                List<Obra> arrayList= dAO.findObraEntities();
+                List<Users> arrayList= dAO.findUsersEntities();
                 
-                double sum = 0;
+               
+                
                 for (int i = 0; i < arrayList.size(); i++) {
-                sum=arrayList.get(i).getValor()+sum;
-            }
-                for (int i = 0; i < arrayList.size(); i++) {
-                    if (arrayList.get(i).getValor()!=0) {
-                            double porcentaje=(arrayList.get(i).getValor()/sum) *100;
-                dataset.setValue(arrayList.get(i).getNombreautor().getNombreautor(), porcentaje);
-                        }else{
-                    double porcentaje=0;
-                dataset.setValue(arrayList.get(i).getNombreautor().getNombreautor(), porcentaje);
-                    }
+                 dataset.setValue(arrayList.get(i).getId(), serialVersionUID);    
             }
                 
 
@@ -63,7 +55,7 @@ public class ChartServlet extends HttpServlet {
 		boolean tooltips = false;
 		boolean urls = false;
 
-		JFreeChart chart = ChartFactory.createPieChart("Obras", dataset, legend, tooltips, urls);
+		JFreeChart chart = ChartFactory.createPieChart("Users", dataset, legend, tooltips, urls);
 
 		chart.setBorderPaint(Color.GREEN);
 		chart.setBorderStroke(new BasicStroke(5.0f));

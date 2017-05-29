@@ -1,8 +1,7 @@
 package com.crunchify.jsp.servlet;
  
-import edu.co.sergio.mundo.dao.ObraDAO;
-import edu.co.sergio.mundo.vo.Artista;
-import edu.co.sergio.mundo.vo.Obra;
+import edu.co.sergio.mundo.dao.UsersJpaController;
+import edu.co.sergio.mundo.vo.Users;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,31 +19,26 @@ import javax.servlet.RequestDispatcher;
 public class HelloCrunchify extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // reading the user input
-        String autor = request.getParameter("autor");
-        String nombre = request.getParameter("nombre");
-        String descripcion= request.getParameter("descripcion");
-        String estilo = request.getParameter("estilo");
-        String valor = request.getParameter("valor");
+        String id = request.getParameter("id");
+        String name = request.getParameter("name");
+        String lastname= request.getParameter("lastname");
         //Se debe incluir validaciones - Lo recuerda: Gestion de Excepciones.
-        ObraDAO dao = new ObraDAO();
+        UsersJpaController dao = new UsersJpaController();
         
-        Obra obra = new Obra();
-        Artista artist=new Artista();
-        artist.setNombreautor(autor);
-        obra.setNombreautor(artist);
-        obra.setNombreobra(nombre);
-        obra.setDescripcion(descripcion);
-        obra.setEstilo(estilo);
-        obra.setValor(Float.valueOf(valor));
+       
+        Users users=new Users();
+        users.setId(id);
+        users.setName(name);
+        users.setLastname(lastname);
         try {
-            dao.create(obra);
+            dao.create(users);
         } catch (Exception ex) {
             Logger.getLogger(HelloCrunchify.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         //Listando la informacion  
-        List<Obra> obras =  dao.findObraEntities();
-        request.setAttribute("obras", obras);
+        List<Users> userss =  dao.findUsersEntities();
+        request.setAttribute("users", userss);
        
        
         //Redireccionando la informacion
